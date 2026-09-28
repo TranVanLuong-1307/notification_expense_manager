@@ -22,7 +22,9 @@ public class NotificationListener extends NotificationListenerService {
     private static NotificationCallback callback;
 
     // MainActivity sẽ đăng ký callback tại đây
-    public static void setNotificationCallback(NotificationCallback newCallback) {
+    public static void setNotificationCallback(
+            NotificationCallback newCallback
+    ) {
         callback = newCallback;
     }
 
@@ -30,60 +32,137 @@ public class NotificationListener extends NotificationListenerService {
     public void onListenerConnected() {
         super.onListenerConnected();
 
-        Log.d(TAG, "Notification Listener connected");
+        Log.d(
+                TAG,
+                "Notification Listener connected"
+        );
     }
 
     @Override
-    public void onNotificationPosted(StatusBarNotification sbn) {
+    public void onNotificationPosted(
+            StatusBarNotification sbn
+    ) {
         super.onNotificationPosted(sbn);
 
         if (sbn == null) {
             return;
         }
 
-        Notification notification = sbn.getNotification();
+        // ==============================
+        // 1. LẤY PACKAGE
+        // ==============================
+
+        String packageName = sbn.getPackageName();
+
+        Log.d(
+                TAG,
+                "Notification nhận từ package: "
+                        + packageName
+        );
+
+        // ==============================
+        // 2. KIỂM TRA BỘ LỌC
+        // ==============================
+
+        if (!NotificationFilter.shouldProcess(packageName)) {
+
+            Log.d(
+                    TAG,
+                    "Bỏ qua notification từ: "
+                            + packageName
+            );
+
+            return;
+        }
+
+        Log.d(
+                TAG,
+                "Notification được chấp nhận: "
+                        + packageName
+        );
+
+        // ==============================
+        // 3. LẤY NOTIFICATION
+        // ==============================
+
+        Notification notification =
+                sbn.getNotification();
 
         if (notification == null) {
             return;
         }
 
-        // 1. Lấy package của ứng dụng gửi notification
-        String packageName = sbn.getPackageName();
+        // ==============================
+        // 4. LẤY TITLE
+        // ==============================
 
-        // 2. Lấy title
         CharSequence titleCharSequence =
-                notification.extras.getCharSequence(Notification.EXTRA_TITLE);
-
-        // 3. Lấy text
-        CharSequence textCharSequence =
-                notification.extras.getCharSequence(Notification.EXTRA_TEXT);
+                notification.extras.getCharSequence(
+                        Notification.EXTRA_TITLE
+                );
 
         String title =
                 titleCharSequence != null
                         ? titleCharSequence.toString()
                         : "";
 
+        // ==============================
+        // 5. LẤY TEXT
+        // ==============================
+
+        CharSequence textCharSequence =
+                notification.extras.getCharSequence(
+                        Notification.EXTRA_TEXT
+                );
+
         String text =
                 textCharSequence != null
                         ? textCharSequence.toString()
                         : "";
 
-        // 4. Lấy thời gian notification
-        long timestamp = sbn.getPostTime();
+        // ==============================
+        // 6. LẤY THỜI GIAN
+        // ==============================
+
+        long timestamp =
+                sbn.getPostTime();
 
         // ==============================
         // DEBUG LOGCAT
         // ==============================
 
-        Log.d(TAG, "==============================");
-        Log.d(TAG, "Package: " + packageName);
-        Log.d(TAG, "Title: " + title);
-        Log.d(TAG, "Text: " + text);
-        Log.d(TAG, "Time: " + timestamp);
-        Log.d(TAG, "==============================");
+        Log.d(
+                TAG,
+                "=============================="
+        );
+
+        Log.d(
+                TAG,
+                "Package: " + packageName
+        );
+
+        Log.d(
+                TAG,
+                "Title: " + title
+        );
+
+        Log.d(
+                TAG,
+                "Text: " + text
+        );
+
+        Log.d(
+                TAG,
+                "Time: " + timestamp
+        );
+
+        Log.d(
+                TAG,
+                "=============================="
+        );
 
         // ==============================
-        // GỬI DỮ LIỆU CHO MAINACTIVITY
+        // 7. GỬI SANG MAINACTIVITY
         // ==============================
 
         if (callback != null) {
@@ -99,13 +178,16 @@ public class NotificationListener extends NotificationListenerService {
 
             Log.d(
                     TAG,
-                    "Callback chưa được đăng ký - Flutter chưa sẵn sàng"
+                    "Callback chưa được đăng ký - "
+                            + "Flutter chưa sẵn sàng"
             );
         }
     }
 
     @Override
-    public void onNotificationRemoved(StatusBarNotification sbn) {
+    public void onNotificationRemoved(
+            StatusBarNotification sbn
+    ) {
         super.onNotificationRemoved(sbn);
 
         if (sbn != null) {
