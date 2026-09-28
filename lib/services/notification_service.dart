@@ -47,4 +47,17 @@ class NotificationService {
       );
     }
   }
+
+  /// Gửi notification ngân hàng giả để kiểm tra.
+  static Future<void> sendTestBankNotification() async {
+    try {
+      await _methodChannel.invokeMethod(
+        'sendTestBankNotification',
+      );
+    } on PlatformException catch (e) {
+      print(
+        'Không thể gửi notification test: ${e.message}',
+      );
+    }
+  }
 }
